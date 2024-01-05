@@ -8,7 +8,7 @@ setup(
     packages=['minigit'],
     entry_points={
         'console_scripts': [
-            'minigit=minigit.main:main',  # Beachte den Doppelpunkt und die Funktion
+            'minigit=minigit.cli:main',  # Beachte den Doppelpunkt und die Funktion
         ],
     },
 )
