@@ -7,19 +7,24 @@ def init():
     os.makedirs(GIT_DIR)
     os.makedirs(f'{GIT_DIR}/objects')
 
-def hash_object(data):
+def hash_object(data, type_='blob'):
     __check_minigit_dir()
-    oid = hashlib.sha1(data).hexdigest()
-    print("oid is: ", oid)
-    print(f'{GIT_DIR}(objects/{oid})')
+    obj = type_.encode() + b'\x00' + data #prepend the object type to each file followed by a NULL byte followed by the content
+    oid = hashlib.sha1(obj).hexdigest()
     with open(f'{GIT_DIR}/objects/{oid}', 'wb') as out_file:
-        out_file.write(data)
+        out_file.write(obj)
     return oid
 
 
-def get_object(oid):
+def get_object(oid, expected='blob'):
     with open(f'{GIT_DIR}/objects/{oid}', 'rb') as file:
-        return file.read()
+        obj = file.read()
+
+    type_, _, content = obj.partition(b'\x00')
+    type_ = type_.decode()
+    if expected is not None:
+        assert type_ == expected, f'Expected {expected}, got {type_}'
+    return content
 
 
 def __check_minigit_dir():
